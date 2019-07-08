@@ -173,7 +173,7 @@ class GSTBiller extends Component
     render()
     {
         return(
-            <div className="billingZone">
+            <div className="billingZone" style={this.props.maximized ? {} : {display:"none"}}>
                 <InputField type="text" value={this.state.customerId} placeholder="Enter the Customer Id." 
                     autoCorrect={false} onChange={this.updatedDatabase} val="custId" color={this.state.color} />
                 {

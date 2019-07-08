@@ -2,6 +2,8 @@
 {
   width: 100%;
   height: 100%;
+  margin:4em;
+  text-align: center;
 }
 .menuBar
 {
@@ -35,6 +37,26 @@
   margin:5px;
   position: relative;
   border: 0.3px dotted gray;
+}
+.reopenIcon
+{
+  text-align: center;
+  border: 0px;
+  width: 60px;
+  height: 70px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  font-size: 41px;
+}
+.reopenIcon i
+{
+  position: relative;
+  top: calc(50% - 70px);
+}
+.reopenIcon:hover
+{
+  background-color: silver;
+  opacity: 0.5;
 }
 .titleApp
 {
@@ -156,6 +178,6 @@
 {
   .webApp
   {
-    max-width: 1890px;
+    max-width: 1740px;
   }
 }

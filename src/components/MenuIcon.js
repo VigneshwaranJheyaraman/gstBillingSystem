@@ -12,11 +12,15 @@ class MenuIcon extends Component
             {
                 this.props.maximizeWindow(e);
             }
-            else
+            else if(this.props.value === "min")
             {
                 this.props.minimizeWindow(e);
             }
-        }}><i className={this.props.iclassName}></i></button>;
+            else
+            {
+                this.props.reopen(e);
+            }
+        }} disabled={this.props.disabled}><i className={this.props.iclassName}></i></button>;
     }
 }
 export default MenuIcon;
