@@ -19,7 +19,9 @@ class GSTBiller extends Component
             suggestBoxDisplay: "none",
             userPurchaseTableDisplay: "none",
             customerPurchaseList:[],
-            customerObjectProperties: ["custid","custName","purid","prodid","prodName","pGst","pPrice","qty","tGst","tPrice"]
+            customerObjectProperties: ["custid","custName","purid","prodid","prodName","pGst","pPrice","qty","tGst","tPrice"],
+            finalPriceWithTax:0,
+            totalGst:0
         };
         this.handleAutoCorrect = this.handleAutoCorrect.bind(this);
         this.updatedDatabase = this.updatedDatabase.bind(this);
@@ -133,7 +135,7 @@ class GSTBiller extends Component
     //reset the form
     resetForm(e)
     {
-        this.setState({customerId:'', productName:'', productId:0, qty:0, autoCompleteInput:''});
+        this.setState({customerId:'', productName:'', productId:0, qty:0, autoCompleteInput:'', userPurchaseTableDisplay:"none", customerPurchaseList:[]});
     }
 
     updateAutoCompleteField(value)
@@ -143,8 +145,9 @@ class GSTBiller extends Component
 
     async getCustomerList()
     {
-        let customerPurchase = {custid:"-",custName:"-",purid:"-",prodid:"-",prodName:"-",pGst:"-",pPrice:"-",qty:"-" ,tGst:0, tPrice:0};
+        let customerPurchase = {custid:"-",custName:"-",purid:"-",prodid:"-",prodName:"-",pGst:"-",pPrice:"-",qty:"-" ,tGst:'-', tPrice:0};
         let customerPurchaseList =[];
+        var amt =0, gst=0;
         var customer = await dataBase.customer.get({custName:this.state.customerId});
         for(let v of customer.purchase){
             customerPurchase = {...customerPurchase,custid:"-",custName:"-",purid:"-",prodid:"-",prodName:"-",pGst:"-",pPrice:"-",qty:"-" };
@@ -157,11 +160,12 @@ class GSTBiller extends Component
             customerPurchase.pGst = p.productid.pGst;
             customerPurchase.pPrice = p.productid.pPrice;
             customerPurchase.qty = p.qty;
-            customerPurchase.tGst += p.productid.pGst;
             customerPurchase.tPrice += p.productid.pPrice*p.qty;
+            amt += (p.productid.pPrice*p.qty) + (p.productid.pPrice*p.qty*( p.productid.pGst/100));
+            gst += p.productid.pGst;
             customerPurchaseList.push(customerPurchase);
         }
-        this.setState({customerPurchaseList: customerPurchaseList});
+        this.setState({customerPurchaseList: customerPurchaseList, finalPriceWithTax:amt, totalGst:gst});
     }
 
     async getPurchaseList(key)
@@ -192,7 +196,8 @@ class GSTBiller extends Component
                     (this.state.userPurchaseTableDisplay !== "none") ? 
                         <UserPurchase responsiveTableClassName="user-purchase" purchaseDisplay={this.state.userPurchaseTableDisplay} tableclassName="user-purchase-table" 
                         tableHeading = {["Customer Id", "Customer Name", "Purchase Id", "Product Id", "Product Name", "GST", "Price (each)", "Qty","Total GST", "Total Price"]}
-                        tableData={this.state.customerPurchaseList} objectattributes={this.state.customerObjectProperties}/>
+                        tableData={this.state.customerPurchaseList} 
+                        objectattributes={this.state.customerObjectProperties} finalPrice={this.state.finalPriceWithTax} totalGst={this.state.totalGst}/>
                     : ""
                 }
             </div>
