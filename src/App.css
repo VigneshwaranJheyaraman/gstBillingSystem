@@ -69,6 +69,60 @@
 {
   text-align: center;
 }
+.customDD
+{
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  height: inherit;
+  width:82%;
+  margin:0px;
+}
+.customDD select
+{
+  background-color: rgb(239, 248, 255);
+  color:black;
+  font-size: 1.5em;
+  width:100%;
+  padding:10px;
+  border:0;
+  margin:0;
+  border-radius: 3px;
+  text-indent: 0.01px;
+  text-overflow: "";
+  -webkit-appearance: button;
+}
+.customDD::before,
+.customDD::after
+{
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+.customDD::after
+{
+  content:"\25BC";
+  height:inherit;
+  line-height: 1.5;
+  right: 1.2em;
+  top:25%;
+}
+.customDD::before
+{
+  width:20px;
+  right:0;
+  top:0;
+  bottom:0;
+  border-radius: 0 3px 3px 0;
+}
+.billingZone select option:nth-child(even)
+{
+  background-color: gray;
+}
+.billingZone select option:nth-child(odd)
+{
+  background-color: lightgrey;
+}
 .billingZone input, .billingZone div input
 {
   font-size: 16px;

@@ -17,13 +17,15 @@ class DropDown extends Component
     render()
     {
         return (
-            <select onChange={this.objectSelection}>
-                {
-                    this.props.objectData.map((v,i) => {
-                        return <option selected={this.props.customerSelected === i} key={i}>{v.custName}</option>
-                    })
-                }
-            </select>
+            <span className={this.props.customDropDownclassName}>
+                <select onChange={this.objectSelection}>
+                    {
+                        this.props.objectData.map((v,i) => {
+                            return <option selected={this.props.customerSelected === i} key={i}>{v.custName}</option>
+                        })
+                    }
+                </select>
+            </span>
         );
     }
 };

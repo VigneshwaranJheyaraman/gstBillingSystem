@@ -205,9 +205,7 @@ class GSTBiller extends Component
     {
         return(
             <div className="billingZone" style={this.props.maximized ? {} : {display:"none"}}>
-                <DropDown objectData={this.state.customerDB} optionSelected={this.checkCustomerAvail} customerSelected={this.state.currentCustomer}/>
-                {/* <InputField type="text" value={this.state.customerId} placeholder="Enter the Customer Id." 
-                    autoCorrect={false} onChange={this.updatedDatabase} val="custId" color={this.state.color} /> */}
+                <DropDown objectData={this.state.customerDB} optionSelected={this.checkCustomerAvail} customerSelected={this.state.currentCustomer} customDropDownclassName="customDD"/>
                 {
                     (this.state.validCustomer) ? <div>
                     <InputField type="text" value={this.state.autoCompleteInput} placeholder="Enter Product Id or Product Name"
