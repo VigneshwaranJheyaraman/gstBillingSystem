@@ -34,7 +34,7 @@
 .webApp
 {
   width: 100%;
-  margin:5px;
+  margin:5em;
   position: relative;
   border: 0.3px dotted gray;
 }
@@ -207,6 +207,22 @@
 {
   background-color: grey;
   color: black;
+}
+.printbutton
+{
+  border-radius: 15%;
+  font-size: 24px;
+  background-color: #06c8ff;
+  margin-bottom: 10px;
+  float: right;
+}
+.excelbutton
+{
+  border-radius: 15%;
+  font-size: 24px;
+  background-color: greenyellow;
+  margin-bottom: 10px;
+  float: right;
 }
 @media(min-width:576px)
 {

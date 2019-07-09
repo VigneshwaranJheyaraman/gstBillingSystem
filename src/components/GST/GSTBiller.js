@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import InputField from '../InputField';
-import Button from '../Button';
+import SubmitButton from '../SubmitButton';
 import dataBase from '../../database';
 import SuggestionBox from '../Suggestion/SuggestionBox';
 import UserPurchase from '../UserPurchase';
@@ -53,10 +53,11 @@ class GSTBiller extends Component
         {
             let sb = Object.assign([], productsDb).filter((v, i) => {
                 if(value.toLowerCase() === v.pName.toLowerCase().substr(0, value.length))return v;
+                return "";
             });
             this.setState({productSuggestion: sb});
         }
-        else if(type="number")
+        else if(type === "number")
         {
             Object.assign([], productsDb).map((v,i) => {
                 if(parseInt(value) === v.prodid)
@@ -69,7 +70,7 @@ class GSTBiller extends Component
         }
         else if(type === "null")
         {
-            this.setState({color:'rgb(255,255,255)', productSuggestion:[], suggestBoxDisplay:"none"});
+            this.setState({color:'rgb(255,255,255)', suggestBoxDisplay:"none", productSuggestion:[], autoCompleteInput:""});
         }
         else
         {
@@ -124,17 +125,18 @@ class GSTBiller extends Component
     //submit the fields to DB
     async addToDatabase(e)
     {
+        var purchaseId=0;
         if(this.state.qty !== 0)
         {
             var product = await dataBase.product.get({pName: this.state.autoCompleteInput});
             var anyPreviousPurchase = await dataBase.purchase.get({pid:product.prodid});
             if(anyPreviousPurchase !==  undefined)
             {
-                var purchaseId = await dataBase.purchase.update(anyPreviousPurchase.purid,{productid: product, qty: (anyPreviousPurchase.qty + this.state.qty), pid:product.prodid});
+                purchaseId = await dataBase.purchase.update(anyPreviousPurchase.purid,{productid: product, qty: (anyPreviousPurchase.qty + this.state.qty), pid:product.prodid});
             }
             else
             {
-                var purchaseId = await dataBase.purchase.put({productid: product, qty: this.state.qty, pid:product.prodid});
+                purchaseId = await dataBase.purchase.put({productid: product, qty: this.state.qty, pid:product.prodid});
             }
             var customer = await dataBase.customer.get({custName:this.state.customerId});
             if(customer.purchase.indexOf(purchaseId) === -1)customer.purchase.push(purchaseId);
@@ -151,7 +153,7 @@ class GSTBiller extends Component
     //reset the form
     resetForm(e)
     {
-        this.setState({customerId:'', productName:'', productId:0, qty:0, autoCompleteInput:'', userPurchaseTableDisplay:"none", customerPurchaseList:[]});
+        this.setState({productName:'', productId:0, qty:0, autoCompleteInput:'', userPurchaseTableDisplay:"none", customerPurchaseList:[], color:"rgb(255,255,255)"});
     }
 
     updateAutoCompleteField(value)
@@ -215,8 +217,8 @@ class GSTBiller extends Component
                     <InputField type="text" onChange={this.updatedDatabase} placeholder="Enter the Quantity."
                         autoCorrect={false} value={this.state.qty} val="qty" color={this.state.color} />
                     <div className="button-grid">
-                        <Button addToDatabase={this.addToDatabase} reset={false} buttonName = "Submit" color="green" />
-                        <Button resetForm={this.resetForm} reset={true} buttonName="Reset" color="#f00" />
+                        <SubmitButton addToDatabase={this.addToDatabase} reset={false} buttonName = "Submit" color="green" />
+                        <SubmitButton resetForm={this.resetForm} reset={true} buttonName="Reset" color="#f00" />
                     </div></div> : ""
                 }
                 {

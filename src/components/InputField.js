@@ -65,9 +65,7 @@ class InputField extends Component
                 else if(e.target.value === "")
                 {
                     this.props.handleAutoCorrect(e.target.value, "null", e);
-                    this.setState({currFoc:0}, ()=>{
-                        this.props.onKeyPress(null, e);
-                    });
+                    this.setState({currFoc:0});
                 }
             }
             else

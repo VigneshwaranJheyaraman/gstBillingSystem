@@ -3,18 +3,11 @@ class Button extends Component
 {
     render()
     {
-        return (
-            <button onClick={(e) => {
-                if(!this.props.reset)
-                {
-                    this.props.addToDatabase(e)
-                }
-                else
-                {
-                    this.props.resetForm(e)
-                }
-            }} style={{backgroundColor:this.props.color}}>{this.props.buttonName}</button>
+        return(
+            <button className={this.props.className} onClick={this.props.onClick}>
+                <i className={this.props.iconClassName}></i>
+            </button>
         );
     }
-}
+};
 export default Button;
