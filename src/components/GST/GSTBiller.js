@@ -4,6 +4,7 @@ import Button from '../Button';
 import dataBase from '../../database';
 import SuggestionBox from '../Suggestion/SuggestionBox';
 import UserPurchase from '../UserPurchase';
+import DropDown from '../DropDown';
 class GSTBiller extends Component
 {
     constructor(props)
@@ -21,7 +22,10 @@ class GSTBiller extends Component
             customerPurchaseList:[],
             customerObjectProperties: ["custid","custName","purid","prodid","prodName","pGst","pPrice","qty","tGst","tPrice"],
             finalPriceWithTax:0,
-            totalGst:0
+            totalGst:0,
+            currentActiveSuggestion:0,
+            customerDB: [],
+            currentCustomer:0
         };
         this.handleAutoCorrect = this.handleAutoCorrect.bind(this);
         this.updatedDatabase = this.updatedDatabase.bind(this);
@@ -30,21 +34,29 @@ class GSTBiller extends Component
         this.checkCustomerAvail = this.checkCustomerAvail.bind(this);
         this.updateAutoCompleteField = this.updateAutoCompleteField.bind(this);
         this.getCustomerList = this.getCustomerList.bind(this);
+        this.handleKeyPressEvent = this.handleKeyPressEvent.bind(this);
+    }
+
+    componentWillMount()
+    {
+        dataBase.customer.toArray().then((r) => {
+            this.setState({customerDB: Object.assign([], r), validCustomer:true, customerId:r[0].custName});
+        });
     }
     //handle autocorrect from DB
-    async handleAutoCorrect(value, e)
+    async handleAutoCorrect(value, type, e)
     {
         this.setState({autoCompleteInput: value, suggestBoxDisplay:"block"});
         var productsDb = await dataBase.product.toArray();
         var productList = this.state.productSuggestion;
-        if(/[a-zA-Z]/.test(value))
+        if(type === "text")
         {
             let sb = Object.assign([], productsDb).filter((v, i) => {
                 if(value.toLowerCase() === v.pName.toLowerCase().substr(0, value.length))return v;
             });
             this.setState({productSuggestion: sb});
         }
-        else if(/[0-9]+/.test(value))
+        else if(type="number")
         {
             Object.assign([], productsDb).map((v,i) => {
                 if(parseInt(value) === v.prodid)
@@ -55,7 +67,7 @@ class GSTBiller extends Component
             });
             this.setState({productSuggestion:productList});
         }
-        else if(value === "")
+        else if(type === "null")
         {
             this.setState({color:'rgb(255,255,255)', productSuggestion:[], suggestBoxDisplay:"none"});
         }
@@ -66,21 +78,17 @@ class GSTBiller extends Component
     }
 
     //check customerAvailabilty in DB
-    checkCustomerAvail(custName)
+    checkCustomerAvail(cust, ind, e)
     {
-        this.setState({validCustomer:false, customerPurchaseList:[], userPurchaseTableDisplay:"none"});
-        dataBase.customer.each((cust) => {
-            if(custName.toLowerCase() === cust.custName)
-            {
-                this.setState({validCustomer: true});
-            }
+        this.setState({validCustomer:false, customerPurchaseList:[], userPurchaseTableDisplay:"none"}, () => {
+            this.setState({customerId: cust, currentCustomer: ind, validCustomer:true})
         });
     }
 
     //updates the db entry to state
-    updatedDatabase(value, val, e)
+    updatedDatabase(value, val, regexBool, e)
     {
-        if(/[a-zA-Z0-9]/.test(value) || value === "")
+        if(regexBool)
         {
             switch(val)
             {
@@ -119,9 +127,17 @@ class GSTBiller extends Component
         if(this.state.qty !== 0)
         {
             var product = await dataBase.product.get({pName: this.state.autoCompleteInput});
-            var purchaseId = await dataBase.purchase.put({productid: product, qty: this.state.qty});
+            var anyPreviousPurchase = await dataBase.purchase.get({pid:product.prodid});
+            if(anyPreviousPurchase !==  undefined)
+            {
+                var purchaseId = await dataBase.purchase.update(anyPreviousPurchase.purid,{productid: product, qty: (anyPreviousPurchase.qty + this.state.qty), pid:product.prodid});
+            }
+            else
+            {
+                var purchaseId = await dataBase.purchase.put({productid: product, qty: this.state.qty, pid:product.prodid});
+            }
             var customer = await dataBase.customer.get({custName:this.state.customerId});
-            customer.purchase.push(purchaseId);
+            if(customer.purchase.indexOf(purchaseId) === -1)customer.purchase.push(purchaseId);
             await dataBase.customer.update(customer.custid, {purchase: customer.purchase});
             this.setState({productName:'', qty:0, autoCompleteInput:"", userPurchaseTableDisplay:"block"});
             this.getCustomerList();
@@ -160,7 +176,7 @@ class GSTBiller extends Component
             customerPurchase.pGst = p.productid.pGst;
             customerPurchase.pPrice = p.productid.pPrice;
             customerPurchase.qty = p.qty;
-            customerPurchase.tPrice += p.productid.pPrice*p.qty;
+            customerPurchase.tPrice = (p.productid.pPrice*p.qty) + (p.productid.pPrice*p.qty*( p.productid.pGst/100));
             amt += (p.productid.pPrice*p.qty) + (p.productid.pPrice*p.qty*( p.productid.pGst/100));
             gst += p.productid.pGst;
             customerPurchaseList.push(customerPurchase);
@@ -174,17 +190,30 @@ class GSTBiller extends Component
         return p;
     }
 
+    handleKeyPressEvent(currFocus, direction, e)
+    {
+        //console.log(currFocus, this.state.productSuggestion[currFocus]);
+        this.setState({currentActiveSuggestion:currFocus}, ()=> {
+            if(direction === "enter")
+            {
+                this.setState({autoCompleteInput:this.state.productSuggestion[this.state.currentActiveSuggestion].pName, suggestBoxDisplay:"none"});
+            }
+        });
+    }
+
     render()
     {
         return(
             <div className="billingZone" style={this.props.maximized ? {} : {display:"none"}}>
-                <InputField type="text" value={this.state.customerId} placeholder="Enter the Customer Id." 
-                    autoCorrect={false} onChange={this.updatedDatabase} val="custId" color={this.state.color} />
+                <DropDown objectData={this.state.customerDB} optionSelected={this.checkCustomerAvail} customerSelected={this.state.currentCustomer}/>
+                {/* <InputField type="text" value={this.state.customerId} placeholder="Enter the Customer Id." 
+                    autoCorrect={false} onChange={this.updatedDatabase} val="custId" color={this.state.color} /> */}
                 {
                     (this.state.validCustomer) ? <div>
                     <InputField type="text" value={this.state.autoCompleteInput} placeholder="Enter Product Id or Product Name"
-                        handleAutoCorrect={this.handleAutoCorrect} autoCorrect={true} color={this.state.color} />
-                    <SuggestionBox display = {this.state.suggestBoxDisplay} suggestions={this.state.productSuggestion} onClick={this.updateAutoCompleteField}/>
+                        handleAutoCorrect={this.handleAutoCorrect} autoCorrect={true} color={this.state.color} onKeyPress={this.handleKeyPressEvent} suggestionLength={this.state.productSuggestion.length}/>
+                    <SuggestionBox display = {this.state.suggestBoxDisplay} suggestions={this.state.productSuggestion}
+                     onClick={this.updateAutoCompleteField} activeSuggestion={this.state.currentActiveSuggestion}/>
                     <InputField type="text" onChange={this.updatedDatabase} placeholder="Enter the Quantity."
                         autoCorrect={false} value={this.state.qty} val="qty" color={this.state.color} />
                     <div className="button-grid">

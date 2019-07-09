@@ -6,7 +6,7 @@ class SuggestionBox extends Component
     {
         const sugg = []
         this.props.suggestions.map((v,i) => {
-            sugg.push(<Suggestion value={v.pName} key={i} onClick={this.props.onClick}/>);
+            sugg.push(<Suggestion className={this.props.activeSuggestion === i ? "activeSuggestion": "suggestionDiv"} value={v.pName} key={i} onClick={this.props.onClick}/>);
             return "";
         });
         return (
