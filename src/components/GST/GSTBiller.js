@@ -35,6 +35,7 @@ class GSTBiller extends Component
         this.updateAutoCompleteField = this.updateAutoCompleteField.bind(this);
         this.getCustomerList = this.getCustomerList.bind(this);
         this.handleKeyPressEvent = this.handleKeyPressEvent.bind(this);
+        this.increaseDecreaseQty = this.increaseDecreaseQty.bind(this);
     }
 
     componentWillMount()
@@ -153,7 +154,7 @@ class GSTBiller extends Component
     //reset the form
     resetForm(e)
     {
-        this.setState({productName:'', productId:0, qty:0, autoCompleteInput:'', userPurchaseTableDisplay:"none", customerPurchaseList:[], color:"rgb(255,255,255)"});
+        this.setState({productName:'', productId:0, qty:0, autoCompleteInput:'', userPurchaseTableDisplay:"none", customerPurchaseList:[], color:"rgb(255,255,255)", suggestBoxDisplay:"none"});
     }
 
     updateAutoCompleteField(value)
@@ -194,13 +195,17 @@ class GSTBiller extends Component
 
     handleKeyPressEvent(currFocus, direction, e)
     {
-        //console.log(currFocus, this.state.productSuggestion[currFocus]);
         this.setState({currentActiveSuggestion:currFocus}, ()=> {
             if(direction === "enter")
             {
                 this.setState({autoCompleteInput:this.state.productSuggestion[this.state.currentActiveSuggestion].pName, suggestBoxDisplay:"none"});
             }
         });
+    }
+
+    increaseDecreaseQty(val,  e)
+    {
+        this.setState({qty: val});
     }
 
     render()
@@ -215,7 +220,7 @@ class GSTBiller extends Component
                     <SuggestionBox display = {this.state.suggestBoxDisplay} suggestions={this.state.productSuggestion}
                      onClick={this.updateAutoCompleteField} activeSuggestion={this.state.currentActiveSuggestion}/>
                     <InputField type="text" onChange={this.updatedDatabase} placeholder="Enter the Quantity."
-                        autoCorrect={false} value={this.state.qty} val="qty" color={this.state.color} />
+                        autoCorrect={false} value={this.state.qty} val="qty" color={this.state.color} onKeyPress={this.increaseDecreaseQty}/>
                     <div className="button-grid">
                         <SubmitButton addToDatabase={this.addToDatabase} reset={false} buttonName = "Submit" color="green" />
                         <SubmitButton resetForm={this.resetForm} reset={true} buttonName="Reset" color="#f00" />

@@ -13,39 +13,51 @@ class InputField extends Component
     {
         if(this.props.autoCorrect)
         {
-        let cF;
-        if(e.keyCode === 40)
-        {
-            cF = this.state.currFoc;
-            if(cF < this.props.suggestionLength-1)
+            let cF;
+            if(e.keyCode === 40)
             {
-                this.setState({currFoc: ++cF}, () => {
-                    this.props.onKeyPress(this.state.currFoc, "down", e);
-                });
+                cF = this.state.currFoc;
+                if(cF < this.props.suggestionLength-1)
+                {
+                    this.setState({currFoc: ++cF}, () => {
+                        this.props.onKeyPress(this.state.currFoc, "down", e);
+                    });
+                }
+            }
+            else if(e.keyCode === 38)
+            {
+                cF = this.state.currFoc;
+                if(cF > 0)
+                {
+                    this.setState({currFoc: --cF}, () => {
+                        this.props.onKeyPress(this.state.currFoc, "up", e);
+                    });
+                }
+                else if(cF  === 0)
+                {
+                    this.setState({currFoc: 0}, () => {
+                        this.props.onKeyPress(this.state.currFoc, "up", e);
+                    });
+                }
+            }
+            else if(e.keyCode === 13)
+            {
+                e.preventDefault();
+                this.props.onKeyPress(this.state.currFoc, "enter", e);
+                this.setState({currFoc:0});
             }
         }
-        else if(e.keyCode === 38)
+        else
         {
-            cF = this.state.currFoc;
-            if(cF > 0)
+            let val = parseInt(e.target.value);
+            if(e.keyCode === 40)
             {
-                this.setState({currFoc: --cF}, () => {
-                    this.props.onKeyPress(this.state.currFoc, "up", e);
-                });
+                this.props.onKeyPress(val > 0 ? (--val): 0,e);
             }
-            else if(cF  === 0)
+            else if(e.keyCode === 38)
             {
-                this.setState({currFoc: 0}, () => {
-                    this.props.onKeyPress(this.state.currFoc, "up", e);
-                });
+                this.props.onKeyPress((++val),e);
             }
-        }
-        else if(e.keyCode === 13)
-        {
-            e.preventDefault();
-            this.props.onKeyPress(this.state.currFoc, "enter", e);
-            this.setState({currFoc:0});
-        }
         }
     }
     render()

@@ -133,8 +133,9 @@
 }
 .suggestBox
 {
-  width:100%;
   position: relative;
+  margin-left:9%;
+  margin-right: 9%;
 }
 .suggestion
 {
@@ -178,7 +179,8 @@
   font-size: 19px;
   text-align: center;
   border:0px;
-  margin-left: 5px;
+  margin: 0 0 5px 5px;
+  border-radius: 15px;
 }
 .user-purchase
 {
