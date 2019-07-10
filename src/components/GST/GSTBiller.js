@@ -226,7 +226,8 @@ class GSTBiller extends Component
                         <UserPurchase responsiveTableClassName="user-purchase" purchaseDisplay={this.state.userPurchaseTableDisplay} tableclassName="user-purchase-table" 
                         tableHeading = {["Customer Id", "Customer Name", "Purchase Id", "Product Id", "Product Name", "GST", "Price (each)", "Qty","Total GST", "Total Price"]}
                         tableData={this.state.customerPurchaseList} 
-                        objectattributes={this.state.customerObjectProperties} finalPrice={this.state.finalPriceWithTax} totalGst={this.state.totalGst}/>
+                        objectattributes={this.state.customerObjectProperties} finalPrice={this.state.finalPriceWithTax}
+                         totalGst={this.state.totalGst} optionsClassName="tableoptions"/>
                     : ""
                 }
             </div>

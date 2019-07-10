@@ -5,7 +5,9 @@ class Button extends Component
     {
         return(
             <button className={this.props.className} onClick={this.props.onClick}>
-                <i className={this.props.iconClassName}></i>
+                <a href={this.props.href} download={this.props.fileName} target="__blank">
+                    <i className={this.props.iconClassName}></i>
+                </a>
             </button>
         );
     }

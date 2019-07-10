@@ -10,7 +10,9 @@ class Table extends Component
     {
         super(props);
         this.state={
-            TableClicked:false
+            TableClicked:false,
+            downloadLink : "",
+            downloadFileName: ""
         };
         this.printTable = this.printTable.bind(this);
         this.exportCsv = this.exportCsv.bind(this);
@@ -29,33 +31,42 @@ class Table extends Component
 
     exportCsv(e)
     {
-        var nav = window.navigator.userAgent;
-        if(nav.indexOf("MSIE ") > 0)
-        {
-            console.log("CLicked");
-            this.setState({TableClicked:true}, () => {
-                var exportWindow = document.open("");
-                exportWindow.write(ReactDOM.findDOMNode(this).outerHTML);
-                exportWindow.execCommand("SaveAs",true,"Say Thanks to Submit.xls");
-                exportWindow.close();
-                this.setState({TableClicked:false});
-            });
-        }
-        else
-        {
-            this.setState({TableClicked:true}, () => {
-            window.open('data:application/vnd.ms-excel,' + encodeURIComponent(ReactDOM.findDOMNode(this).outerHTML));
-            this.setState({TableClicked:false});
+        var uriComponent = "";
+        let customerName = this.props.tableData[0].custName;
+        this.props.tableHeading.forEach((v) => {
+            uriComponent += v+","
         });
-        }
+        uriComponent +="\r\n";
+        this.props.tableData.forEach((v) => {
+            this.props.objectattributes.forEach((a) => {
+                uriComponent += v[a] +",";
+            });
+            uriComponent += "\r\n";
+        });
+        this.props.tableHeading.forEach((v,i) => {
+            if(i === 0)
+            {
+                uriComponent += "Final Price" + ",";
+            }
+            else if(i === (this.props.tableHeading.length -1))
+            {
+                uriComponent += this.props.finalPrice +",";
+            }
+            else
+            {
+                uriComponent += " ,";
+            }
+        });
+        uriComponent += "\r\n";
+        this.setState({downloadLink:"data:application/csv;;charset=UTF-8,"+encodeURIComponent(uriComponent), downloadFileName:`${customerName}_${(new Date()).getTime()}.csv`});
     }
     render()
     {
         return <table className={this.props.className} style={this.state.TableClicked?{border:"1px solid"}:{}}>
             <thead>
                 <tr style={{backgroundColor:"transparent"}}>
-                    <td><Button className="printbutton" iconClassName="fa fa-print" onClick={this.printTable}/></td>
-                    <td><Button className="excelbutton" iconClassName="fa fa-file" onClick={this.exportCsv} /></td>
+                    <td className={this.props.optionsClassName}><Button className="printbutton" iconClassName="fa fa-print" onClick={this.printTable} href=""/></td>
+                    <td className={this.props.optionsClassName}><Button className="excelbutton" iconClassName="fa fa-file" onClick={this.exportCsv} href={this.state.downloadLink} fileName={this.state.downloadFileName}/></td>
                 </tr>
                 <TableHeading tableHeading={this.props.tableHeading} />
             </thead>

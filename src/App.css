@@ -208,6 +208,10 @@
   background-color: grey;
   color: black;
 }
+.tableoptions
+{
+  float: left;
+}
 .printbutton
 {
   border-radius: 15%;
@@ -223,6 +227,16 @@
   background-color: greenyellow;
   margin-bottom: 10px;
   float: right;
+}
+.printbutton a
+{
+  text-decoration: none;
+  color:white;
+}
+.excelbutton a
+{
+  text-decoration: none;
+  color: green;
 }
 @media(min-width:576px)
 {

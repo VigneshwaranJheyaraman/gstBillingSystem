@@ -6,7 +6,7 @@ class UserPurchase extends Component
     {
         return <div className={this.props.responsiveTableClassName} style={{display:this.props.purchaseDisplay}}>
             <Table className={this.props.tableclassName} tableHeading={this.props.tableHeading} tableData = {this.props.tableData} 
-            objectattributes={this.props.objectattributes} finalPrice={this.props.finalPrice} totalGst={this.props.totalGst}/>
+            objectattributes={this.props.objectattributes} finalPrice={this.props.finalPrice} totalGst={this.props.totalGst} optionsClassName={this.props.optionsClassName}/>
         </div>
     }
 };
